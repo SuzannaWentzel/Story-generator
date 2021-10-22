@@ -93,10 +93,12 @@ def get_log_probability(word, context, _grams, _gram_dict, _gram_dict_count, _vo
 # - unknown threshold is currently not really used
 # - n is the amount of n-grams, 3 works well
 # - randomness is from how many words a word will be picked, 2 works well
+# - max-length is the maximum length an alinea should be
 INIT = {
     'unknown_treshold': 1,
     'n': 3,
-    'randomness': 2
+    'randomness': 2,
+    'max_length': 100
 }
 
 
@@ -154,7 +156,7 @@ generated_text = unknowned_input
 last_word = ''
 
 # generate complementary
-while last_word != ALINEA_TAG:
+while last_word != ALINEA_TAG and i < INIT['max_length']:
     gram_input = get_last_ngram(generated_text)
 
     # loop through n's to find suitable ngrams
@@ -193,6 +195,7 @@ while last_word != ALINEA_TAG:
     last_word = probable_words[random_index][0]
     generated_text += probable_words[random_index][0] + ' '
     print('Generated: ', generated_text)
+    i += 1
 
 print('The generated text is: ', generated_text)
 

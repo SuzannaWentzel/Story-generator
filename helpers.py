@@ -2,7 +2,7 @@ import nltk
 from nltk import word_tokenize
 
 ALINEA_TAG = 'ALINEA'
-PUNC = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
+PUNC = '''!()-[]{};:'"\\,<>./?@#$%^&*_~'''
 
 
 # Returns if token is punctuation mark

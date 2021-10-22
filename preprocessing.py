@@ -31,7 +31,7 @@ def set_alinea_tag(text):
 
 
 def write_to_file(text):
-    f = open("processed_data/lotr.txt", "w", encoding='utf8')
+    f = open("processed_data/preprocessing.py.txt", "w", encoding='utf8')
     f.write(text)
     f.close()
 

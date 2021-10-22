@@ -9,9 +9,11 @@ from helpers import set_pos_tag, ALINEA_TAG
 
 UNKNOWN_TAG = 'UNKNOWN'
 
+BOOK = "GoT"
+
 
 def get_preprocessed():
-    with open('processed_data/lotr.txt', 'r', encoding="utf8") as file_object:
+    with open('processed_data/' + BOOK + '.txt', 'r', encoding="utf8") as file_object:
         data = file_object.read()
         return data
 
@@ -27,8 +29,8 @@ def count_words(words, _vocab):
 
 def replace_unknown(text, counts):
     # check if unknown was computed before; if so: read from file
-    if file_exists('processed_data/unknown/lotr_' + str(INIT['unknown_treshold']) + '.txt'):
-        with open('processed_data/unknown/lotr_' + str(INIT['unknown_treshold']) + '.txt', 'r', encoding="utf8") as file_object:
+    if file_exists('processed_data/unknown/' + BOOK + '_' + str(INIT['unknown_treshold']) + '.txt'):
+        with open('processed_data/unknown/' + BOOK + '_' + str(INIT['unknown_treshold']) + '.txt', 'r', encoding="utf8") as file_object:
             replaced_unknown_words = file_object.read()
             return replaced_unknown_words
     else:
@@ -37,7 +39,7 @@ def replace_unknown(text, counts):
         for word in possible_unknowns:
             regex = r' ' + word + ' '
             replaced_unknown_words = re.sub(regex, ' ' + UNKNOWN_TAG + ' ', replaced_unknown_words)
-        write_to_file(replaced_unknown_words, 'processed_data/unknown/lotr_' + str(INIT['unknown_treshold']) + '.txt')
+        write_to_file(replaced_unknown_words, 'processed_data/unknown/' + BOOK + '_' + str(INIT['unknown_treshold']) + '.txt')
         return replaced_unknown_words
 
 

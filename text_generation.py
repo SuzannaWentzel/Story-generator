@@ -9,11 +9,9 @@ from helpers import set_pos_tag, ALINEA_TAG
 
 UNKNOWN_TAG = 'UNKNOWN'
 
-BOOK = "GoT"
-
 
 def get_preprocessed():
-    with open('processed_data/' + BOOK + '.txt', 'r', encoding="utf8") as file_object:
+    with open('processed_data/' + INIT['corpus'] + '.txt', 'r', encoding="utf8") as file_object:
         data = file_object.read()
         return data
 
@@ -29,8 +27,8 @@ def count_words(words, _vocab):
 
 def replace_unknown(text, counts):
     # check if unknown was computed before; if so: read from file
-    if file_exists('processed_data/unknown/' + BOOK + '_' + str(INIT['unknown_treshold']) + '.txt'):
-        with open('processed_data/unknown/' + BOOK + '_' + str(INIT['unknown_treshold']) + '.txt', 'r', encoding="utf8") as file_object:
+    if file_exists('processed_data/unknown/' + INIT['corpus'] + '_' + str(INIT['unknown_treshold']) + '.txt'):
+        with open('processed_data/unknown/' + INIT['corpus'] + '_' + str(INIT['unknown_treshold']) + '.txt', 'r', encoding="utf8") as file_object:
             replaced_unknown_words = file_object.read()
             return replaced_unknown_words
     else:
@@ -39,7 +37,7 @@ def replace_unknown(text, counts):
         for word in possible_unknowns:
             regex = r' ' + word + ' '
             replaced_unknown_words = re.sub(regex, ' ' + UNKNOWN_TAG + ' ', replaced_unknown_words)
-        write_to_file(replaced_unknown_words, 'processed_data/unknown/' + BOOK + '_' + str(INIT['unknown_treshold']) + '.txt')
+        write_to_file(replaced_unknown_words, 'processed_data/unknown/' + INIT['corpus'] + '_' + str(INIT['unknown_treshold']) + '.txt')
         return replaced_unknown_words
 
 
@@ -59,9 +57,9 @@ def get_ngrams(text, n):
     return [(gram[0:word_index], gram[word_index]) for gram in _grams]
 
 
-def get_last_ngram(text):
+def get_last_ngram(text, n):
     words = text.split()
-    split_index = len(words) - INIT['n'] + 1
+    split_index = len(words) - n + 1
     return tuple(words[split_index:])
 
 
@@ -100,7 +98,8 @@ INIT = {
     'unknown_treshold': 1,
     'n': 3,
     'randomness': 2,
-    'max_length': 100
+    'max_length': 100,
+    'corpus': 'GoT'
 }
 
 
@@ -159,13 +158,14 @@ last_word = ''
 
 # generate complementary
 while last_word != ALINEA_TAG and i < INIT['max_length']:
-    gram_input = get_last_ngram(generated_text)
-
     # loop through n's to find suitable ngrams
     lower_gram = INIT['n']
     probabilities = []
     words_have_prob = False
+
     while lower_gram != 1 and not words_have_prob:
+        gram_input = get_last_ngram(generated_text, lower_gram)
+
         # compute probability for each word in vocab
         probabilities = [(word, get_log_probability(word, gram_input, n_grams[lower_gram], n_gram_dict[lower_gram], n_gram_dict_count[lower_gram], vocab))
                          for word in vocab]
@@ -186,11 +186,8 @@ while last_word != ALINEA_TAG and i < INIT['max_length']:
         lower_gram -= 1
 
     if not words_have_prob:
-        # split_index = len(count_words) - INIT['randomness']
-        # probable_words = count_words[split_index:]
+        # Needed for when input contains unknown words, choose random word from vocab
         probable_words = [(word, 0) for word in random.sample(vocab, INIT['randomness'])]
-        # Choosing word from frequently occurring words does not work
-        # Choose random word from vocab
 
     # choose word randomly from x highest words
     random_index = random.randint(0, len(probable_words) - 1)

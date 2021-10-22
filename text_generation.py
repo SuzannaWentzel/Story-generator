@@ -96,8 +96,8 @@ def get_log_probability(word, context, _grams, _gram_dict, _gram_dict_count, _vo
 # - max-length is the maximum length an alinea should be
 INIT = {
     'unknown_treshold': 1,
-    'n': 3,
-    'randomness': 2,
+    'n': 4,
+    'randomness': 5,
     'max_length': 100,
     'corpus': 'GoT'
 }
@@ -162,8 +162,9 @@ while last_word != ALINEA_TAG and i < INIT['max_length']:
     lower_gram = INIT['n']
     probabilities = []
     words_have_prob = False
+    probable_words = []
 
-    while lower_gram != 1 and not words_have_prob:
+    while lower_gram != 1:
         gram_input = get_last_ngram(generated_text, lower_gram)
 
         # compute probability for each word in vocab
@@ -173,19 +174,25 @@ while last_word != ALINEA_TAG and i < INIT['max_length']:
 
         # sort probabilities
         probabilities.sort(key=lambda y: y[1])
-        split_index = len(probabilities) - INIT['randomness']
-        probable_words = probabilities[split_index:]
 
-        # check if all words did not occur in this n gram before
-        for word in probable_words:
-            if word[1] != unknown_prob:
-                words_have_prob = True
+        # get words with probabilities (so starting from end of list as probabilities is sort ascending)
+        j = len(probabilities) - 1
+        while probabilities[j][1] > unknown_prob:
+            probable_words.append(probabilities[j])
+            j -= 1
 
-        if words_have_prob:
+        # if we have multiple options, pre-choose based on randomness
+        if len(probable_words) > INIT['randomness']:
+            probable_words = random.sample(probable_words, INIT['randomness'])
+
+        # check if found words with probabilities
+        if len(probable_words) > 0:
             break
+
+        # otherwise lower ngram and try again
         lower_gram -= 1
 
-    if not words_have_prob:
+    if len(probable_words) == 0:
         # Needed for when input contains unknown words, choose random word from vocab
         probable_words = [(word, 0) for word in random.sample(vocab, INIT['randomness'])]
 

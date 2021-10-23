@@ -99,7 +99,7 @@ INIT = {
     'n': 4,
     'randomness': 5,
     'max_length': 100,
-    'corpus': 'GoT'
+    'corpus': 'lotr'
 }
 
 
@@ -205,4 +205,12 @@ while last_word != ALINEA_TAG and i < INIT['max_length']:
 
 print('The generated text is: ', generated_text)
 
-
+split_text = generated_text.split(" ")
+for i in range(0, len(split_text)):
+    split_part = split_text[i].split("_")
+    if len(split_part) > 1:
+        split_text[i] = split_part[1]
+    else:
+        split_text[i] = split_part[0]
+non_split_text = ' '.join(split_text)
+print(non_split_text)
